@@ -5,10 +5,12 @@ import {
   Trash2,
   Send,
   FileDown,
+  Crop,
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
 import { ApiKeyModal } from './components/ApiKeyModal';
+import { ImageCropModal } from './components/ImageCropModal';
 import { removeBackgroundViaDeepInfra } from './services/deepinfra';
 import { fileToBase64, downloadAsPng, downloadAsJpg } from './utils/imageUtils';
 
@@ -26,6 +28,7 @@ export const App: React.FC = () => {
   const [inputFileName, setInputFileName] = useState<string>('image');
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cropTarget, setCropTarget] = useState<'input' | 'output' | null>(null);
   const [statusMessage, setStatusMessage] = useState<{
     type: 'error' | 'success';
     text: string;
@@ -234,6 +237,16 @@ export const App: React.FC = () => {
           <div className="flex items-center justify-end space-x-2 sm:space-x-3 mt-2 sm:mt-3 mb-3 pr-1">
             <button
               type="button"
+              onClick={() => setCropTarget('input')}
+              disabled={!inputImage || isProcessing}
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-amber-300 active:bg-[#2a2a2a] disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
+              title="Cắt ảnh đầu vào (Crop)"
+              aria-label="Cắt ảnh đầu vào"
+            >
+              <Crop className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
               onClick={handleClear}
               disabled={!inputImage}
               className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-red-400 active:bg-red-950/40 disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
@@ -338,8 +351,18 @@ export const App: React.FC = () => {
             )}
           </div>
 
-          {/* Cụm nút xuất file góc dưới bên phải - Chạm bấm mượt mà */}
+          {/* Cụm nút cắt & xuất file góc dưới bên phải - Chạm bấm mượt mà */}
           <div className="flex items-center justify-end space-x-2 mt-4 pt-1">
+            <button
+              type="button"
+              onClick={() => setCropTarget('output')}
+              disabled={!outputImage || isProcessing}
+              className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-3.5 py-2 rounded text-sm font-medium flex items-center space-x-1.5 transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation mr-1"
+              title="Cắt ảnh kết quả (Crop Output)"
+            >
+              <Crop className="w-4 h-4" />
+              <span>Crop</span>
+            </button>
             <div className="p-2 text-white opacity-80" title="Tải xuống">
               <FileDown className="w-5 h-5" />
             </div>
@@ -362,6 +385,23 @@ export const App: React.FC = () => {
           </div>
         </section>
       </main>
+
+      {/* Modal cắt ảnh kiểu Photoshop cho cả Input và Output */}
+      <ImageCropModal
+        isOpen={cropTarget !== null}
+        imageUrl={cropTarget === 'input' ? inputImage : outputImage}
+        targetLabel={cropTarget === 'input' ? 'Input' : 'Output'}
+        showAutoTrim={cropTarget === 'output'}
+        onClose={() => setCropTarget(null)}
+        onApply={(croppedUrl) => {
+          if (cropTarget === 'input') {
+            setInputImage(croppedUrl);
+            setOutputImage(null);
+          } else if (cropTarget === 'output') {
+            setOutputImage(croppedUrl);
+          }
+        }}
+      />
 
       {/* Modal cấu hình DeepInfra API */}
       <ApiKeyModal

@@ -72,6 +72,107 @@ export function downloadAsPng(imageUrl: string, filename: string): void {
   downloadFile(imageUrl, filename);
 }
 
+export interface CropRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Cắt ảnh theo tọa độ pixel gốc trên HTML5 Canvas (giữ nguyên 100% độ nét và kênh Alpha trong suốt)
+ */
+export async function cropImageToDataUrl(
+  imageUrl: string,
+  crop: CropRect
+): Promise<string> {
+  const img = await loadImage(imageUrl);
+  const sx = Math.max(0, Math.round(crop.x));
+  const sy = Math.max(0, Math.round(crop.y));
+  const sw = Math.max(1, Math.min(img.naturalWidth - sx, Math.round(crop.width)));
+  const sh = Math.max(1, Math.min(img.naturalHeight - sy, Math.round(crop.height)));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = sw;
+  canvas.height = sh;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('Không thể khởi tạo Canvas 2D để cắt ảnh.');
+  }
+
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+  return canvas.toDataURL('image/png');
+}
+
+/**
+ * Tự động tìm khung bao sát chủ thể không trong suốt (tương tự Photoshop Image -> Trim)
+ */
+export async function getNonTransparentBounds(
+  imageUrl: string,
+  paddingRatio = 0.02
+): Promise<CropRect | null> {
+  const img = await loadImage(imageUrl);
+  const natW = img.naturalWidth;
+  const natH = img.naturalHeight;
+  if (!natW || !natH) return null;
+
+  // Thu nhỏ tạm thời nếu ảnh rất lớn để quét pixel cực nhanh (< 5ms)
+  const maxScanDim = 1024;
+  const scale = Math.min(1, maxScanDim / Math.max(natW, natH));
+  const scanW = Math.max(1, Math.round(natW * scale));
+  const scanH = Math.max(1, Math.round(natH * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = scanW;
+  canvas.height = scanH;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  ctx.drawImage(img, 0, 0, scanW, scanH);
+  const { data } = ctx.getImageData(0, 0, scanW, scanH);
+
+  let minX = scanW;
+  let minY = scanH;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < scanH; y++) {
+    for (let x = 0; x < scanW; x++) {
+      const alpha = data[(y * scanW + x) * 4 + 3];
+      if (alpha > 12) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return null;
+  }
+
+  const rawX = minX / scale;
+  const rawY = minY / scale;
+  const rawW = (maxX - minX + 1) / scale;
+  const rawH = (maxY - minY + 1) / scale;
+
+  const padX = Math.round(natW * paddingRatio);
+  const padY = Math.round(natH * paddingRatio);
+
+  const x = Math.max(0, Math.floor(rawX - padX));
+  const y = Math.max(0, Math.floor(rawY - padY));
+  const right = Math.min(natW, Math.ceil(rawX + rawW + padX));
+  const bottom = Math.min(natH, Math.ceil(rawY + rawH + padY));
+
+  return {
+    x,
+    y,
+    width: Math.max(1, right - x),
+    height: Math.max(1, bottom - y),
+  };
+}
+
 /**
  * Sao chép ảnh vào Clipboard (PNG)
  */
