@@ -27,6 +27,7 @@ export const App: React.FC = () => {
   const [inputFileName, setInputFileName] = useState<string>('image');
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [cropTarget, setCropTarget] = useState<'input' | 'output' | null>(null);
   const [statusMessage, setStatusMessage] = useState<{
     type: 'error' | 'success';
@@ -209,32 +210,15 @@ export const App: React.FC = () => {
       )}
 
       {/* 2. Main Content Grid: Tự động xếp dọc trên Mobile, chia đôi 2 cột đồng bộ cao độ trên Desktop */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_auto_1fr] divide-y md:divide-y-0 md:divide-x divide-[#2e2e2e] px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-16 lg:px-8 lg:pt-8 lg:pb-16 gap-y-6 md:gap-y-0">
+      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_1fr] divide-y md:divide-y-0 md:divide-x divide-[#2e2e2e] px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-16 lg:px-8 lg:pt-8 lg:pb-16 gap-y-6 md:gap-y-0">
         
         {/* === Cột 1: Input (Ở trên trên mobile, bên trái trên desktop) === */}
-        <section className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-3 md:pr-8 pb-6 md:pb-0">
-          <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Input</h2>
+        <section className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-2 md:pr-8 pb-6 md:pb-0">
+          {/* Hàng tiêu đề & biểu tượng thao tác Input */}
+          <div className="flex items-center justify-between h-10 mb-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white">Input</h2>
 
-          {/* Cụm điều khiển phía trên khung Input */}
-          <div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileInputChange}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-[#353535] hover:bg-[#3f3f3f] active:scale-[0.99] border border-[#555555] text-white py-3 sm:py-3.5 px-4 rounded flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-sm group touch-manipulation"
-            >
-              <FileUp className="w-5 h-5 text-slate-200 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-medium tracking-wide">Upload image</span>
-            </button>
-
-            {/* Dòng biểu tượng thao tác: Vùng chạm chuẩn Mobile (40x40px) */}
-            <div className="flex items-center justify-end space-x-2 sm:space-x-3 mt-2 sm:mt-3 mb-3 pr-1">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <button
                 type="button"
                 onClick={() => setCropTarget('input')}
@@ -285,31 +269,61 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Vùng hiển thị ảnh Input - Đồng bộ cao độ với Output */}
+          {/* Vùng kéo thả & hiển thị ảnh Input (chứa nút Upload bên trong) */}
           <div
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragOver(true);
+            }}
+            onDragLeave={() => setIsDragOver(false)}
             onDrop={(e) => {
               e.preventDefault();
+              setIsDragOver(false);
               if (e.dataTransfer.files && e.dataTransfer.files[0]) {
                 handleFile(e.dataTransfer.files[0]);
               }
             }}
-            className="flex-1 h-full min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] rounded flex items-center justify-center relative overflow-hidden bg-[#0a0a0a]"
+            onClick={() => {
+              if (!inputImage) {
+                fileInputRef.current?.click();
+              }
+            }}
+            className={`flex-1 h-full min-h-[280px] sm:min-h-[400px] md:min-h-[500px] max-h-[560px] md:max-h-[640px] rounded flex items-center justify-center relative overflow-hidden transition-colors ${
+              isDragOver ? 'bg-[#161616]' : 'bg-[#0a0a0a]'
+            } ${!inputImage ? 'cursor-pointer' : ''}`}
           >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileInputChange}
+              className="hidden"
+            />
+
             {inputImage ? (
               <img
                 src={inputImage}
                 alt="Input preview"
-                className="max-h-full max-w-full w-auto h-auto object-contain rounded"
+                className="max-h-[560px] md:max-h-full max-w-full w-auto h-auto object-contain rounded"
               />
             ) : (
-              <div className="text-center text-[#555555] text-xs px-4 py-8 space-y-1.5">
-                <p className="font-medium text-slate-400">Chưa có ảnh nào được chọn</p>
-                <p className="text-[11px] opacity-70 hidden sm:block">
+              <div className="flex flex-col items-center justify-center px-6 py-8 text-center space-y-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  className="bg-[#353535] hover:bg-[#3f3f3f] active:scale-[0.98] border border-[#555555] text-white py-3 px-6 rounded flex items-center justify-center space-x-2.5 transition-all cursor-pointer shadow-sm group touch-manipulation"
+                >
+                  <FileUp className="w-5 h-5 text-slate-200 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium tracking-wide">Upload image</span>
+                </button>
+                <p className="text-[11px] text-[#666666] hidden sm:block">
                   Kéo thả ảnh vào đây hoặc nhấn Ctrl + V để dán
                 </p>
-                <p className="text-[11px] opacity-70 sm:hidden">
-                  Chạm nút "Upload image" để chọn ảnh từ máy hoặc chụp mới
+                <p className="text-[11px] text-[#666666] sm:hidden">
+                  Chạm để chọn ảnh từ máy hoặc chụp mới
                 </p>
               </div>
             )}
@@ -317,12 +331,12 @@ export const App: React.FC = () => {
         </section>
 
         {/* === Cột 2: Output (Ở dưới trên mobile, bên phải trên desktop) === */}
-        <section ref={outputSectionRef} className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-3 md:pl-8 pt-6 md:pt-0">
-          <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Output</h2>
+        <section ref={outputSectionRef} className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-2 md:pl-8 pt-6 md:pt-0">
+          {/* Hàng tiêu đề & 3 nút điều khiển Output: Crop, Png, jpg */}
+          <div className="flex items-center justify-between h-10 mb-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white">Output</h2>
 
-          {/* Cụm 3 nút điều khiển phía trên khung Output: Crop, Png, jpg */}
-          <div className="flex flex-col justify-end mb-3">
-            <div className="flex items-center justify-end space-x-2 h-10">
+            <div className="flex items-center space-x-2">
               <button
                 type="button"
                 onClick={() => setCropTarget('output')}
@@ -352,8 +366,8 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Khung viền lớn hiển thị Output - Đồng bộ cao độ 100% với Input */}
-          <div className="flex-1 h-full min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] border border-[#444444] bg-[#000000] rounded flex items-center justify-center relative overflow-hidden">
+          {/* Khung hiển thị Output - Không viền, đồng bộ màu nền & cao độ 100% với Input */}
+          <div className="flex-1 h-full min-h-[280px] sm:min-h-[400px] md:min-h-[500px] max-h-[560px] md:max-h-[640px] bg-[#0a0a0a] rounded flex items-center justify-center relative overflow-hidden">
             {isProcessing && (
               <div className="flex items-center justify-center p-6" role="status" aria-label="Đang tách nền">
                 <div className="flex items-center space-x-2.5">
@@ -378,7 +392,7 @@ export const App: React.FC = () => {
                 <img
                   src={outputImage}
                   alt="Output result"
-                  className="max-h-full max-w-full w-auto h-auto object-contain"
+                  className="max-h-[560px] md:max-h-full max-w-full w-auto h-auto object-contain"
                 />
               </div>
             )}
