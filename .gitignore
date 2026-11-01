@@ -28,5 +28,6 @@ dist-ssr
 .env.*
 !.env.example
 
-# Temporary / scratch
+# Temporary / scratch / Netlify state
 .gemini
+.netlify
