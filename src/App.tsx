@@ -5,7 +5,6 @@ import {
   Trash2,
   Send,
   FileDown,
-  Loader2,
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
@@ -208,7 +207,7 @@ export const App: React.FC = () => {
       )}
 
       {/* 2. Main Content Grid: Tự động xếp dọc trên Mobile, chia đôi 2 cột trên Desktop */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#2e2e2e] p-4 sm:p-6 lg:p-8 gap-y-6 md:gap-y-0">
+      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#2e2e2e] px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-16 lg:px-8 lg:pt-8 lg:pb-16 gap-y-6 md:gap-y-0">
         
         {/* === Cột 1: Input (Ở trên trên mobile, bên trái trên desktop) === */}
         <section className="flex flex-col md:pr-8 pb-6 md:pb-0">
@@ -252,7 +251,20 @@ export const App: React.FC = () => {
               aria-label="Bắt đầu tách nền"
             >
               {isProcessing ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <div className="flex items-center space-x-1" aria-label="Đang xử lý">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
+                    style={{ animationDelay: '0ms' }}
+                  />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
+                    style={{ animationDelay: '150ms' }}
+                  />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
+                    style={{ animationDelay: '300ms' }}
+                  />
+                </div>
               ) : (
                 <Send className="w-5 h-5" />
               )}
@@ -297,11 +309,21 @@ export const App: React.FC = () => {
           {/* Khung viền lớn hiển thị Output */}
           <div className="flex-1 min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] border border-[#444444] bg-[#000000] rounded flex items-center justify-center relative overflow-hidden">
             {isProcessing && (
-              <div className="flex flex-col items-center space-y-3 text-slate-300 p-4">
-                <Loader2 className="w-8 h-8 animate-spin text-white" />
-                <span className="text-xs tracking-wider uppercase font-medium text-center">
-                  Đang tách nền qua DeepInfra...
-                </span>
+              <div className="flex items-center justify-center p-6" role="status" aria-label="Đang tách nền">
+                <div className="flex items-center space-x-2.5">
+                  <span
+                    className="w-3 h-3 rounded-full bg-white animate-dot-wave"
+                    style={{ animationDelay: '0ms' }}
+                  />
+                  <span
+                    className="w-3 h-3 rounded-full bg-white animate-dot-wave"
+                    style={{ animationDelay: '160ms' }}
+                  />
+                  <span
+                    className="w-3 h-3 rounded-full bg-white animate-dot-wave"
+                    style={{ animationDelay: '320ms' }}
+                  />
+                </div>
               </div>
             )}
 

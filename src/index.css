@@ -41,3 +41,34 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* Smooth 3-dot wave loading animation */
+@keyframes dot-wave {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@keyframes dot-wave-sm {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.animate-dot-wave {
+  animation: dot-wave 1.15s ease-in-out infinite;
+}
+
+.animate-dot-wave-sm {
+  animation: dot-wave-sm 1.15s ease-in-out infinite;
+}
