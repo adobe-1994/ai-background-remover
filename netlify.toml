@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy yêu cầu tới DeepInfra API khi chạy trên Netlify
+[[redirects]]
+  from = "/api/deepinfra/*"
+  to = "https://api.deepinfra.com/:splat"
+  status = 200
+  force = true
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
