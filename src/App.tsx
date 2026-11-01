@@ -4,7 +4,6 @@ import {
   FileUp,
   Trash2,
   Send,
-  FileDown,
   Crop,
   AlertCircle,
   CheckCircle2,
@@ -209,82 +208,84 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* 2. Main Content Grid: Tự động xếp dọc trên Mobile, chia đôi 2 cột trên Desktop */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#2e2e2e] px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-16 lg:px-8 lg:pt-8 lg:pb-16 gap-y-6 md:gap-y-0">
+      {/* 2. Main Content Grid: Tự động xếp dọc trên Mobile, chia đôi 2 cột đồng bộ cao độ trên Desktop */}
+      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_auto_1fr] divide-y md:divide-y-0 md:divide-x divide-[#2e2e2e] px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-16 lg:px-8 lg:pt-8 lg:pb-16 gap-y-6 md:gap-y-0">
         
         {/* === Cột 1: Input (Ở trên trên mobile, bên trái trên desktop) === */}
-        <section className="flex flex-col md:pr-8 pb-6 md:pb-0">
+        <section className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-3 md:pr-8 pb-6 md:pb-0">
           <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Input</h2>
 
-          {/* Nút Upload image - Vùng bấm rộng rãi cho ngón tay */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileInputChange}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full bg-[#353535] hover:bg-[#3f3f3f] active:scale-[0.99] border border-[#555555] text-white py-3 sm:py-3.5 px-4 rounded flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-sm group touch-manipulation"
-          >
-            <FileUp className="w-5 h-5 text-slate-200 group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-medium tracking-wide">Upload image</span>
-          </button>
+          {/* Cụm điều khiển phía trên khung Input */}
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileInputChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full bg-[#353535] hover:bg-[#3f3f3f] active:scale-[0.99] border border-[#555555] text-white py-3 sm:py-3.5 px-4 rounded flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-sm group touch-manipulation"
+            >
+              <FileUp className="w-5 h-5 text-slate-200 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium tracking-wide">Upload image</span>
+            </button>
 
-          {/* Dòng biểu tượng thao tác: Vùng chạm chuẩn Mobile (40x40px) */}
-          <div className="flex items-center justify-end space-x-2 sm:space-x-3 mt-2 sm:mt-3 mb-3 pr-1">
-            <button
-              type="button"
-              onClick={() => setCropTarget('input')}
-              disabled={!inputImage || isProcessing}
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-amber-300 active:bg-[#2a2a2a] disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
-              title="Cắt ảnh đầu vào (Crop)"
-              aria-label="Cắt ảnh đầu vào"
-            >
-              <Crop className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={!inputImage}
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-red-400 active:bg-red-950/40 disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
-              title="Xóa ảnh"
-              aria-label="Xóa ảnh"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleProcess}
-              disabled={!inputImage || isProcessing}
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-indigo-400 active:bg-indigo-950/40 disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
-              title="Bắt đầu tách nền"
-              aria-label="Bắt đầu tách nền"
-            >
-              {isProcessing ? (
-                <div className="flex items-center space-x-1" aria-label="Đang xử lý">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
-                    style={{ animationDelay: '0ms' }}
-                  />
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
-                    style={{ animationDelay: '150ms' }}
-                  />
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
-                    style={{ animationDelay: '300ms' }}
-                  />
-                </div>
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </button>
+            {/* Dòng biểu tượng thao tác: Vùng chạm chuẩn Mobile (40x40px) */}
+            <div className="flex items-center justify-end space-x-2 sm:space-x-3 mt-2 sm:mt-3 mb-3 pr-1">
+              <button
+                type="button"
+                onClick={() => setCropTarget('input')}
+                disabled={!inputImage || isProcessing}
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-amber-300 active:bg-[#2a2a2a] disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
+                title="Cắt ảnh đầu vào (Crop)"
+                aria-label="Cắt ảnh đầu vào"
+              >
+                <Crop className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleClear}
+                disabled={!inputImage}
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-red-400 active:bg-red-950/40 disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
+                title="Xóa ảnh"
+                aria-label="Xóa ảnh"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleProcess}
+                disabled={!inputImage || isProcessing}
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-indigo-400 active:bg-indigo-950/40 disabled:opacity-30 disabled:hover:text-white transition-all cursor-pointer touch-manipulation"
+                title="Bắt đầu tách nền"
+                aria-label="Bắt đầu tách nền"
+              >
+                {isProcessing ? (
+                  <div className="flex items-center space-x-1" aria-label="Đang xử lý">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
+                      style={{ animationDelay: '0ms' }}
+                    />
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
+                      style={{ animationDelay: '150ms' }}
+                    />
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-white animate-dot-wave-sm"
+                      style={{ animationDelay: '300ms' }}
+                    />
+                  </div>
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Vùng hiển thị ảnh Input - Chiều cao linh hoạt theo thiết bị */}
+          {/* Vùng hiển thị ảnh Input - Đồng bộ cao độ với Output */}
           <div
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
@@ -293,13 +294,13 @@ export const App: React.FC = () => {
                 handleFile(e.dataTransfer.files[0]);
               }
             }}
-            className="flex-1 min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] rounded flex items-center justify-center relative overflow-hidden bg-[#0a0a0a]"
+            className="flex-1 h-full min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] rounded flex items-center justify-center relative overflow-hidden bg-[#0a0a0a]"
           >
             {inputImage ? (
               <img
                 src={inputImage}
                 alt="Input preview"
-                className="max-h-[540px] w-auto max-w-full object-contain rounded"
+                className="max-h-full max-w-full w-auto h-auto object-contain rounded"
               />
             ) : (
               <div className="text-center text-[#555555] text-xs px-4 py-8 space-y-1.5">
@@ -316,11 +317,43 @@ export const App: React.FC = () => {
         </section>
 
         {/* === Cột 2: Output (Ở dưới trên mobile, bên phải trên desktop) === */}
-        <section ref={outputSectionRef} className="flex flex-col md:pl-8 pt-6 md:pt-0">
+        <section ref={outputSectionRef} className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-3 md:pl-8 pt-6 md:pt-0">
           <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Output</h2>
 
-          {/* Khung viền lớn hiển thị Output */}
-          <div className="flex-1 min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] border border-[#444444] bg-[#000000] rounded flex items-center justify-center relative overflow-hidden">
+          {/* Cụm 3 nút điều khiển phía trên khung Output: Crop, Png, jpg */}
+          <div className="flex flex-col justify-end mb-3">
+            <div className="flex items-center justify-end space-x-2 h-10">
+              <button
+                type="button"
+                onClick={() => setCropTarget('output')}
+                disabled={!outputImage || isProcessing}
+                className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-4 h-9 rounded text-sm font-medium flex items-center space-x-1.5 transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
+                title="Cắt ảnh kết quả (Crop Output)"
+              >
+                <Crop className="w-4 h-4" />
+                <span>Crop</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadPng}
+                disabled={!outputImage}
+                className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-5 h-9 rounded text-sm font-medium transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
+              >
+                Png
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadJpg}
+                disabled={!outputImage}
+                className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-5 h-9 rounded text-sm font-medium transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
+              >
+                jpg
+              </button>
+            </div>
+          </div>
+
+          {/* Khung viền lớn hiển thị Output - Đồng bộ cao độ 100% với Input */}
+          <div className="flex-1 h-full min-h-[260px] sm:min-h-[380px] md:min-h-[460px] max-h-[580px] border border-[#444444] bg-[#000000] rounded flex items-center justify-center relative overflow-hidden">
             {isProcessing && (
               <div className="flex items-center justify-center p-6" role="status" aria-label="Đang tách nền">
                 <div className="flex items-center space-x-2.5">
@@ -341,47 +374,14 @@ export const App: React.FC = () => {
             )}
 
             {!isProcessing && outputImage && (
-              <div className="w-full h-full flex items-center justify-center bg-checkerboard p-2">
+              <div className="w-full h-full flex items-center justify-center bg-checkerboard">
                 <img
                   src={outputImage}
                   alt="Output result"
-                  className="max-h-[540px] w-auto max-w-full object-contain"
+                  className="max-h-full max-w-full w-auto h-auto object-contain"
                 />
               </div>
             )}
-          </div>
-
-          {/* Cụm nút cắt & xuất file góc dưới bên phải - Chạm bấm mượt mà */}
-          <div className="flex items-center justify-end space-x-2 mt-4 pt-1">
-            <button
-              type="button"
-              onClick={() => setCropTarget('output')}
-              disabled={!outputImage || isProcessing}
-              className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-3.5 py-2 rounded text-sm font-medium flex items-center space-x-1.5 transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation mr-1"
-              title="Cắt ảnh kết quả (Crop Output)"
-            >
-              <Crop className="w-4 h-4" />
-              <span>Crop</span>
-            </button>
-            <div className="p-2 text-white opacity-80" title="Tải xuống">
-              <FileDown className="w-5 h-5" />
-            </div>
-            <button
-              type="button"
-              onClick={handleDownloadPng}
-              disabled={!outputImage}
-              className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-5 py-2 rounded text-sm font-medium transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
-            >
-              Png
-            </button>
-            <button
-              type="button"
-              onClick={handleDownloadJpg}
-              disabled={!outputImage}
-              className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-5 py-2 rounded text-sm font-medium transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
-            >
-              jpg
-            </button>
           </div>
         </section>
       </main>
