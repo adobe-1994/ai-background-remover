@@ -336,12 +336,12 @@ export const App: React.FC = () => {
           <div className="flex items-center justify-between h-10 mb-3">
             <h2 className="text-lg sm:text-xl font-bold text-white">Output</h2>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <button
                 type="button"
                 onClick={() => setCropTarget('output')}
                 disabled={!outputImage || isProcessing}
-                className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-4 h-9 rounded text-sm font-medium flex items-center space-x-1.5 transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
+                className="px-2.5 sm:px-3 h-10 rounded-lg text-sm font-medium flex items-center justify-center space-x-1.5 text-white hover:text-amber-300 active:bg-[#2a2a2a] active:scale-95 disabled:opacity-30 disabled:hover:text-white disabled:active:bg-transparent disabled:active:scale-100 transition-all cursor-pointer touch-manipulation"
                 title="Cắt ảnh kết quả (Crop Output)"
               >
                 <Crop className="w-4 h-4" />
@@ -351,7 +351,8 @@ export const App: React.FC = () => {
                 type="button"
                 onClick={handleDownloadPng}
                 disabled={!outputImage}
-                className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-5 h-9 rounded text-sm font-medium transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
+                className="px-2.5 sm:px-3 h-10 rounded-lg text-sm font-medium flex items-center justify-center text-white hover:text-indigo-400 active:bg-[#2a2a2a] active:scale-95 disabled:opacity-30 disabled:hover:text-white disabled:active:bg-transparent disabled:active:scale-100 transition-all cursor-pointer touch-manipulation"
+                title="Tải ảnh định dạng PNG (nền trong suốt)"
               >
                 Png
               </button>
@@ -359,7 +360,8 @@ export const App: React.FC = () => {
                 type="button"
                 onClick={handleDownloadJpg}
                 disabled={!outputImage}
-                className="bg-[#2c2c2c] hover:bg-[#3a3a3a] active:scale-95 border border-[#4a4a4a] text-white px-5 h-9 rounded text-sm font-medium transition-all disabled:opacity-30 disabled:hover:bg-[#2c2c2c] cursor-pointer touch-manipulation"
+                className="px-2.5 sm:px-3 h-10 rounded-lg text-sm font-medium flex items-center justify-center text-white hover:text-indigo-400 active:bg-[#2a2a2a] active:scale-95 disabled:opacity-30 disabled:hover:text-white disabled:active:bg-transparent disabled:active:scale-100 transition-all cursor-pointer touch-manipulation"
+                title="Tải ảnh định dạng JPG (nền trắng)"
               >
                 jpg
               </button>
